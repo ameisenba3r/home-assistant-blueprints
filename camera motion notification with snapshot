@@ -16,13 +16,17 @@ blueprint:
       selector:
         entity:
           domain: camera
-    notify_target:
-      name: Notification Target
-      description: 'Select the notification service to use. This will show all available notify services in your Home Assistant instance.'
+    notify_service:
+      name: Notification Service
+      description: 'The notification service to use. Select from common options or type your own (e.g., notify.notify, notify.mobile_app_your_device, notify.your_group).'
+      default: notify.notify
       selector:
-        target:
-          entity:
-            - domain: notify
+        select:
+          options:
+            - label: All Devices (notify.notify)
+              value: notify.notify
+          custom_value: true
+          mode: dropdown
     notification_title:
       name: Notification Title
       description: 'Default: "Camera Alert"'
@@ -79,7 +83,7 @@ variables:
   binary_sensor: !input 'binary_sensor'
   binary_sensor_name: '{{ states[binary_sensor].name }}'
   camera: !input 'camera'
-  notify_target: !input 'notify_target'
+  notify_service: !input 'notify_service'
   notification_title: !input 'notification_title'
   notification_message: !input 'notification_message'
   click_action: !input 'click_action'
@@ -96,8 +100,7 @@ action:
   entity_id: !input 'camera'
   data:
     filename: '{{ snapshot_create_file_path }}'
-- service: notify.notify
-  target: '{{ notify_target }}'
+- service: '{{ notify_service }}'
   data:
     title: '{{ notification_title }}'
     message: '{{ notification_message }}'
